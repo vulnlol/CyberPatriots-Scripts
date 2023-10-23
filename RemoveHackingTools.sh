@@ -20,7 +20,7 @@ else
 fi
 
 # List of prohibited hacking tools
-HACKING_TOOLS=("ophcrack" "wireshark" "nmap" "john" "hydra" "metasploit-framework" "aircrack-ng" "nikto")
+HACKING_TOOLS=("ophcrack" "wireshark" "nmap" "john" "hydra" "metasploit-framework" "aircrack-ng" "nikto" "tcpdump" "burpsuite" "sqlmap" "hashcat" "ettercap-text-only" "kismet" "reaver" "radare2" "wifite")
 
 # Checking each tool, and prompting for removal if it's installed
 for tool in "${HACKING_TOOLS[@]}"; do
