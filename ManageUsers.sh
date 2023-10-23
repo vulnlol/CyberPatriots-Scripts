@@ -1,63 +1,44 @@
 #!/bin/bash
 
-# Function to display the menu
-display_menu() {
-    echo "1. Add User"
-    echo "2. Delete User"
-    echo "3. Change User Password"
-    echo "4. List Users"
-    echo "5. Exit"
-    read -p "Please choose an option: " choice
+# Function to confirm action
+confirm() {
+    read -p "$1 (y/n): " choice
+    case "$choice" in
+        y|Y ) return 0;;
+        * ) return 1;;
+    esac
 }
 
-# Function to add a user
-add_user() {
-    read -p "Enter the username to add: " username
-    sudo adduser "$username"
-    echo "User $username added successfully!"
+# Function to check if a user is a sudoer
+is_sudoer() {
+    sudo -l -U "$1" | grep -q "(ALL : ALL) ALL"
+    return $?
 }
 
-# Function to delete a user
-delete_user() {
-    read -p "Enter the username to delete: " username
-    sudo deluser "$username"
-    echo "User $username deleted successfully!"
-}
-
-# Function to change a user's password
-change_password() {
-    read -p "Enter the username to change the password for: " username
-    sudo passwd "$username"
-    echo "Password for $username changed successfully!"
-}
-
-# Function to list users and identify administrators
+# Function to list users and their groups
 list_users() {
-    echo "Listing users:"
-    for user in $(cut -d: -f1 /etc/passwd); do
-        if groups "$user" | grep -q "sudo"; then
-            echo "$user (admin)"
+    users=$(getent passwd | cut -d: -f1)
+    echo "Listing users and their groups:"
+    for user in $users; do
+        if is_sudoer "$user"; then
+            echo -e "\n* [ADMIN] User: $user"
         else
-            echo "$user"
+            echo -e "\n* User: $user"
         fi
+        groups=$(id -Gn "$user" | tr ' ' ', ')
+        echo "  - Groups: $groups"
     done
 }
 
-# Main function to execute the options
-manage_users() {
-    while true; do
-        display_menu
-        
-        case $choice in
-            1) add_user ;;
-            2) delete_user ;;
-            3) change_password ;;
-            4) list_users ;;
-            5) break ;;
-            *) echo "Invalid option, please choose again." ;;
-        esac
-    done
+# Function to change user password
+change_password() {
+    read -p "Enter the username to change the password: " username
+    sudo passwd "$username"
 }
 
-# Calling the main function
-manage_users
+# Display menu and execute choice
+while true; do
+    echo "1. List users"
+    echo "2. Change user password"
+    echo "3. Exit"
+    read -p "Choose an option: " option
