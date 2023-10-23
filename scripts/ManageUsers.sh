@@ -1,44 +1,59 @@
 #!/bin/bash
 
-# Function to confirm action
-confirm() {
-    read -p "$1 (y/n): " choice
-    case "$choice" in
-        y|Y ) return 0;;
-        * ) return 1;;
-    esac
+# Function to display users and their groups and identify root users
+echo "Listing users:"
+for user in $(getent passwd | cut -d: -f1); do
+    uid=$(id -u $user)
+    groups=$(id -Gn $user)
+    if [[ $uid -eq 0 ]] || [[ $groups =~ "sudo" ]] || [[ $groups =~ "root" ]]; then
+        echo "* $user is a ROOT user. Groups: $groups"
+    else
+        echo "  $user. Groups: $groups"
+    fi
+done
+echo
+
+# Function to add a new user
+add_user() {
+    read -p "Enter the new username: " username
+    sudo adduser $username
+    read -sp "Enter the password for $username: " password
+    echo -e "$password\n$password" | sudo passwd $username
+    echo
+    echo "$username has been added with the specified password."
+    echo
 }
 
-# Function to check if a user is a sudoer
-is_sudoer() {
-    sudo -l -U "$1" | grep -q "(ALL : ALL) ALL"
-    return $?
+# Function to lock a user account
+lock_user() {
+    read -p "Enter the username to lock: " username
+    sudo passwd -l $username
+    echo "$username has been locked."
+    echo
 }
 
-# Function to list users and their groups
-list_users() {
-    users=$(getent passwd | cut -d: -f1)
-    echo "Listing users and their groups:"
-    for user in $users; do
-        if is_sudoer "$user"; then
-            echo -e "\n* [ADMIN] User: $user"
-        else
-            echo -e "\n* User: $user"
-        fi
-        groups=$(id -Gn "$user" | tr ' ' ', ')
-        echo "  - Groups: $groups"
-    done
-}
+# Other functions like change_password, modify_user, and show_menu go here
 
-# Function to change user password
-change_password() {
-    read -p "Enter the username to change the password: " username
-    sudo passwd "$username"
-}
-
-# Display menu and execute choice
-while true; do
-    echo "1. List users"
+# Function to display menu
+show_menu() {
+    echo "1. Add new user"
     echo "2. Change user password"
-    echo "3. Exit"
-    read -p "Choose an option: " option
+    echo "3. Promote/Demote user"
+    echo "4. Lock user account"
+    echo "5. Exit"
+}
+
+# Main loop
+while true; do
+    show_menu
+    read -p "Enter your choice: " choice
+
+    case $choice in
+        1) add_user;;
+        2) change_password;;
+        3) modify_user;;
+        4) lock_user;;
+        5) exit 0;;
+        *) echo "Invalid choice, please enter a number between 1 and 5.";;
+    esac
+done
