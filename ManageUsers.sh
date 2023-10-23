@@ -5,7 +5,8 @@ display_menu() {
     echo "1. Add User"
     echo "2. Delete User"
     echo "3. Change User Password"
-    echo "4. Exit"
+    echo "4. List Users"
+    echo "5. Exit"
     read -p "Please choose an option: " choice
 }
 
@@ -30,6 +31,18 @@ change_password() {
     echo "Password for $username changed successfully!"
 }
 
+# Function to list users and identify administrators
+list_users() {
+    echo "Listing users:"
+    for user in $(cut -d: -f1 /etc/passwd); do
+        if groups "$user" | grep -q "sudo"; then
+            echo "$user (admin)"
+        else
+            echo "$user"
+        fi
+    done
+}
+
 # Main function to execute the options
 manage_users() {
     while true; do
@@ -39,7 +52,8 @@ manage_users() {
             1) add_user ;;
             2) delete_user ;;
             3) change_password ;;
-            4) break ;;
+            4) list_users ;;
+            5) break ;;
             *) echo "Invalid option, please choose again." ;;
         esac
     done
