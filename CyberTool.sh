@@ -6,6 +6,8 @@ if [[ $EUID -ne 0 ]]; then
    exit 1
 fi
 
+SCRIPT_DIR="$(dirname "$0")/scripts"
+
 echo "
   ____      _                 _____           _ 
  / ___|   _| |__   ___ _ __  |_   _|__   ___ | |
@@ -15,12 +17,11 @@ echo "
       |___/                                     
 "
 
-SCRIPT_DIR="$(dirname "$0")/scripts"
-
 # Function to display the menu and get user selection
 select_scripts() {
     scripts=($SCRIPT_DIR/*)
     echo "Available scripts:"
+    echo "0. Run all scripts"
     for i in "${!scripts[@]}"; do
         echo "$((i+1)). $(basename "${scripts[$i]}" .sh)"
     done
@@ -33,7 +34,13 @@ select_scripts() {
 # Function to run the selected scripts
 run_selected_scripts() {
     for choice in $choices; do
-        if [[ "$choice" =~ ^[0-9]+$ ]] && [ "$choice" -ge 1 ] && [ "$choice" -le "${#scripts[@]}" ]; then
+        if [[ "$choice" == 0 ]]; then
+            for script in "${scripts[@]}"; do
+                echo "Running $(basename "$script" .sh)"
+                bash "$script"
+                echo
+            done
+        elif [[ "$choice" =~ ^[0-9]+$ ]] && [ "$choice" -ge 1 ] && [ "$choice" -le "${#scripts[@]}" ]; then
             echo "Running $(basename "${scripts[$((choice-1))]}" .sh)"
             bash "${scripts[$((choice-1))]}"
             echo
