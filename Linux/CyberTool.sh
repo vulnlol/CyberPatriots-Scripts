@@ -14,6 +14,7 @@ SCRIPT_DIR="$(dirname "$0")/scripts"
 
 # Function to display the available scripts in a menu format
 show_scripts() {
+    clear
     echo "  ____      _                 _____           _ "
     echo " / ___|   _| |__   ___ _ __  |_   _|__   ___ | |"
     echo "| |  | | | | '_ \ / _ \ '__|   | |/ _ \ / _ \| |"
