@@ -20,5 +20,8 @@ Disable-LocalUser -Name "Guest"
 # Force Logoff When Hours Expire
 # Note: You may have to manually configure this from Group Policy
 
+Set-ADDefaultDomainPasswordPolicy -ReversibleEncryptionEnabled $false
+
+
 # Display a message
 Write-Output "Password and Account Policies have been updated successfully."

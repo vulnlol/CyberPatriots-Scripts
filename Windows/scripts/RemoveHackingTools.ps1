@@ -20,7 +20,7 @@ function SearchAndRemove-HackingTool {
     }
 }
 
-# Predefined list of suspected hacking tools
+# Predefined list of suspected hacking tools, would prefer to come up with a better method for doing this.
 $hackingTools = @(
     "nc.exe",         # Netcat
     "plink.exe",      # PuTTY Link
