@@ -34,6 +34,13 @@ function Manage-Group {
     $username = Read-Host "Enter the username"
     $groupName = Read-Host "Enter the group name"
     $action = Read-Host "Add or remove from group? (a/r)"
+
+    # Check if the group exists, create if it doesn't
+    if (-Not (Get-LocalGroup -Name $groupName -ErrorAction SilentlyContinue)) {
+        New-LocalGroup -Name $groupName
+        Write-Host "Group '$groupName' has been created."
+    }
+
     if ($action -eq "a") {
         Add-LocalGroupMember -Group $groupName -Member $username
         Write-Host "$username has been added to $groupName."

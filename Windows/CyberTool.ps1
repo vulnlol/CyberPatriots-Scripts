@@ -16,18 +16,27 @@ function Show-Scripts {
     Write-Host
 }
 
-# Function to execute selected scripts
+# Function to execute selected scripts and log the output
 function Execute-Scripts {
     $choice = Read-Host "Enter the number or letter of the script you want to run"
     $scripts = Get-ChildItem "scripts\*.ps1"
+    $logFile = "script_log.txt"
 
     if ($choice -ieq "A") {
         foreach ($script in $scripts) {
-            & "scripts\$($script.Name)"
+            try {
+                & "scripts\$($script.Name)" 4>&1 | Out-File -Append $logFile
+            } catch {
+                $_ | Out-File -Append $logFile
+            }
         }
     }
     elseif ($choice -match "^\d+$" -and $choice -le $scripts.Count) {
-        & "scripts\$($scripts[$choice - 1].Name)"
+        try {
+            & "scripts\$($scripts[$choice - 1].Name)" 4>&1 | Out-File -Append $logFile
+        } catch {
+            $_ | Out-File -Append $logFile
+        }
     }
     else {
         Write-Host "Invalid choice. Please enter a valid number or 'A'." -ForegroundColor Red

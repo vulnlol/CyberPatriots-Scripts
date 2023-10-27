@@ -11,37 +11,41 @@ function List-UserFiles {
 
     foreach ($user in $users) {
         $userPath = $user.FullName
-        $files = Get-ChildItem -Path $userPath -Recurse -File -Exclude ".*" | Where-Object { $_.FullName -notmatch '\\\.' }
+        try {
+            $files = Get-ChildItem -Path $userPath -Recurse -File -Exclude ".*" | Where-Object { $_.FullName -notmatch '\\\.' }
         
-        Write-Output "---------------------------------------"
-        Write-Output "Files in $userPath:"
-        Write-Output "---------------------------------------"
+            Write-Output "---------------------------------------"
+            Write-Output "Files in $userPath:"
+            Write-Output "---------------------------------------"
         
-        $fileList = @()
-        $counter = 0
-        foreach ($file in $files) {
-            $counter++
-            $fileList += $file.FullName
-            Write-Output "$counter. $($file.FullName)"
-        }
+            $fileList = @()
+            $counter = 0
+            foreach ($file in $files) {
+                $counter++
+                $fileList += $file.FullName
+                Write-Output "$counter. $($file.FullName)"
+            }
 
-        Write-Output "---------------------------------------"
-        $filesToDelete = Read-Host "Enter the numbers of the files you want to delete (separated by space), or press Enter to skip"
-        
-        if ($filesToDelete) {
-            $filesToDelete.Split(' ') | ForEach-Object {
-                $index = [int]$_ - 1
-                if ($fileList[$index]) {
-                    Remove-Item -Path $fileList[$index] -Force
-                    Write-Output "Deleted: $($fileList[$index])"
-                }
-                else {
-                    Write-Output "Invalid selection: $_. No such file number exists."
+            Write-Output "---------------------------------------"
+            $filesToDelete = Read-Host "Enter the numbers of the files you want to delete (separated by space), or press Enter to skip"
+
+            if ($filesToDelete) {
+                $filesToDelete.Split(' ') | ForEach-Object {
+                    $index = [int]$_ - 1
+                    if ($fileList[$index]) {
+                        Remove-Item -Path $fileList[$index] -Force
+                        Write-Output "Deleted: $($fileList[$index])"
+                    }
+                    else {
+                        Write-Output "Invalid selection: $_. No such file number exists."
+                    }
                 }
             }
-        }
-        else {
-            Write-Output "No files were deleted."
+            else {
+                Write-Output "No files were deleted."
+            }
+        } catch {
+            Write-Output "An error occurred while processing $userPath: $_"
         }
     }
 }
