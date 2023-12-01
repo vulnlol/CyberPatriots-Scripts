@@ -15,6 +15,7 @@ do
   for line in "${lines[@]}"
   do
     echo "$line"   # Display the current line
-    read -r  # Wait for Enter key press without prompt
+    #read -r  # Wait for Enter key press without prompt
   done
 done
+sudo 
